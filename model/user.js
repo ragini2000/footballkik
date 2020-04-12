@@ -8,9 +8,7 @@ const userSchema=mongoose.Schema({
     password:{type:String,unique:true,default:""},//we add default here since if user wants to login through fb or gmail, we dont need him to enter pasword
     UserImage:{type:String,default:"default.png"},//in database, we only store the name of the image and not the image itself, image is stored in AWS bucket
     facebook:{type:String,default:""},
-    fbToken:Array,
-    google:{type:String,default:""},
-    googleTokens:Array
+    fbToken:Array
 
 });
 

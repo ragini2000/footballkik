@@ -13,7 +13,7 @@ const passport=require("passport");//Passport stuff will help us authenticating 
 
 const container=require("./container");
 
-container.resolve(function(users, _){
+container.resolve(function(users, _, admin){
     //configuration============================================================================================================
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/footballkik',{ useUnifiedTopology: true, useNewUrlParser: true}); //connect to our database  
@@ -30,12 +30,13 @@ container.resolve(function(users, _){
         //setup router
         const router = require("express-promise-router")();
         users.SetRouting(router);
+        admin.SetRouting(router);
         app.use(router);
     }
     function ConfigureExpress(app){
         require("./passport/passport-local");//passport local for configuration
         require("./passport/passport-facebook");//passport fb for configuration
-
+        require("./passport/passport-google");//passport google for configuration
         //setup express application
         app.use(express.static("public"));
         app.use(cookieParser());//read cookies (needed for auth)
