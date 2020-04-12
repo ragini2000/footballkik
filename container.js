@@ -1,9 +1,11 @@
-var dependable = require('dependable');
+const dependable = require('dependable');
 const path=require('path');
 const container=dependable.container();
 
 const simpleDependencies=[
-    ['_','lodash']
+    ['_','lodash'],
+    ['mongoose','mongoose'],
+    ['passport','passport'],
 
 ]
 simpleDependencies.forEach(function(val){
