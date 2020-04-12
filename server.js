@@ -33,7 +33,9 @@ container.resolve(function(users, _){
         app.use(router);
     }
     function ConfigureExpress(app){
-        require("./passport/passport-local");//passport for configuration
+        require("./passport/passport-local");//passport local for configuration
+        require("./passport/passport-facebook");//passport fb for configuration
+
         //setup express application
         app.use(express.static("public"));
         app.use(cookieParser());//read cookies (needed for auth)

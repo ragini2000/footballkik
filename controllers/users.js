@@ -4,6 +4,8 @@ module.exports = function (_,passport,User){
         SetRouting: function (router){
             router.get("/",this.indexPage);
             router.get("/signup",this.getSignup);
+            router.get('/auth/facebook', this.getFacebookLogin);
+            router.get('/auth/facebook/callback', this.facebookLogin);
             router.get("/home",this.homePage);
             router.post("/",User.LoginValidation,this.postLogin);
             router.post("/signup",User.SignUpvalidation,this.postSignup);
@@ -31,6 +33,14 @@ module.exports = function (_,passport,User){
                 failureRedirect: '/signup',//if not successful, than back to signup page
                 failureFlash: true // able to show flash messages
         }),
+        getFacebookLogin: passport.authenticate('facebook', {
+            scope: 'email' 
+         }),
+        facebookLogin: passport.authenticate('facebook', {
+            successRedirect: '/home',
+            failureRedirect: '/signup',
+            failureFlash: true
+        })
         
     }
 }
