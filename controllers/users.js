@@ -5,16 +5,23 @@ module.exports = function (_,passport,User){
             router.get("/",this.indexPage);
             router.get("/signup",this.getSignup);
             router.get("/home",this.homePage);
+            router.post("/",User.LoginValidation,this.postLogin);
             router.post("/signup",User.SignUpvalidation,this.postSignup);
             
 
         },
         indexPage: function (req, res){
-            return res.render("index");
+            const errors=req.flash("error");
+            return res.render("index",{title:'Login', messages: errors, hasErrors:errors.length>0});
         },
+        postLogin:passport.authenticate('local.login', { 
+            successRedirect: '/home',
+            failureRedirect: '/',
+            failureFlash: true 
+        }),
         getSignup:function(req,res){
             const errors=req.flash("error");
-            return res.render("signup",{title:'MyChatApp | SignUp', messages: errors, hasErrors:errors.length>0});// if error.length greater than zero that hasErrors is set to true that will allow bootstrap alert to be displayed 
+            return res.render("signup",{title:'SignUp', messages: errors, hasErrors:errors.length>0});// if error.length greater than zero that hasErrors is set to true that will allow bootstrap alert to be displayed 
         },
         homePage: function(req,res){
             return res.render('home');

@@ -18,9 +18,8 @@ passport.use("local.signup",new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback:true//all of the users data will be passed into the callback
-  },
-  function(req, email, password, done) {
-    User.findOne({ "email": email }, function(err, user) {
+  },(req, email, password, done)=> {
+    User.findOne({ "email": email }, (err, user)=> {
         if (err) { return done(err); }//This err contains the error caused due to network erroe or something else
         if (user) {
           return done(null, false,req.flash("error","Email already exist"));//if user data exist in database
@@ -36,3 +35,20 @@ passport.use("local.signup",new LocalStrategy({
           });
     });
 }));
+
+passport.use("local.login",new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password',
+  passReqToCallback:true//all of the users data will be passed into the callback
+}, (req, email, password, done) =>{
+  User.findOne({ "email": email }, (err, user) =>{
+      if (err) { return done(err); }//This err contains the error caused due to network erroe or something else
+      const messages=[];
+      if (!user || !user.validUserPassword(password)) {
+        messages.push('Email does not exist or password is invalid');
+        return done(null, false,req.flash("error",messages));
+      }
+      return done(null,user);
+  });
+}));
+
