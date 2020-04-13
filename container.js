@@ -6,6 +6,7 @@ const simpleDependencies=[
     ['_','lodash'],
     ['mongoose','mongoose'],
     ['passport','passport'],
+    ['formidable','formidable']//boday-parser doesnt allow us to pass data like images and files hence a third party module like formidable is used
 
 ]
 simpleDependencies.forEach(function(val){
