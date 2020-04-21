@@ -1,4 +1,4 @@
-//This page will hold the local lohin functionality
+//This page will hold the local login functionality
 'use strict';
 const passport=require("passport");
 const User=require("../model/user");
@@ -14,7 +14,7 @@ passport.deserializeUser(function(id, done) {//deserializeUser is used to retriv
     });
 });
 
-passport.use("local.signup",new LocalStrategy({
+passport.use("local.signup",new LocalStrategy({//this is the passport middleware
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback:true//all of the users data will be passed into the callback

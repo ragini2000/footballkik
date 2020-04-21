@@ -1,13 +1,23 @@
 var path=require("path");
 var fs=require("fs");
-module.exports=function(formidable){
+module.exports=function(formidable,Club){
     return{
         SetRouting:function(router){
             router.get('/dashboard', this.adminPage);
             router.post('/uploadFile', this.uploadFile);//for images/file
+            router.post('/dashboard', this.adminPostPage);//adding post route to save filename and properties into the database
         },
         adminPage: function(req, res){
             res.render('admin/dashboard');
+        },
+        adminPostPage: function(req, res){
+            const newClub = new Club();//represent different chat groups
+            newClub.name = req.body.club;s
+            newClub.country = req.body.country;
+            newClub.image = req.body.upload;
+            newClub.save((err) => {
+                res.render('admin/dashboard');
+            })
         },
         uploadFile: function(req, res) {//add formidable events to add images to a local folder public/uploads in the project
             const form = new formidable.IncomingForm();//incomingForm method available in formidable module
