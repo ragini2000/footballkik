@@ -12,7 +12,7 @@ module.exports=function(formidable,Club){
         },
         adminPostPage: function(req, res){
             const newClub = new Club();//represent different chat groups
-            newClub.name = req.body.club;s
+            newClub.name = req.body.club;
             newClub.country = req.body.country;
             newClub.image = req.body.upload;
             newClub.save((err) => {
