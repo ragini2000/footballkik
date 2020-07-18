@@ -5,7 +5,7 @@ module.exports=function(){
         },
         groupPage: function(req,res){
             const name=req.params.name;
-            res.render("groupchat/group",{title:"Footballkik-group",groupName:name});
+            res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name});
         }
     }
 }

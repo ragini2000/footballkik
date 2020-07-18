@@ -11,7 +11,8 @@ module.exports=function(io){
             console.log(message);//returns data emitted from client side
             io.to(message.room).emit('newMessage',{//emit event to all the clients connected to a particular channel/room including the sender of the particular event
                 text: message.text,//emitted a new event from the server
-                room: message.room
+                room: message.room,
+                from: message.sender
             });
             callback();
         });
