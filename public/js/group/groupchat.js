@@ -14,8 +14,13 @@ $(document).ready(function(){
     });
     
     socket.on('newMessage',function(data){//to listen to the event coming from server side, "data" stores the data that comes along with event 
-        console.log(data);//displayed in the browser
+    var template=$('#message-template').html();//we have the message template coming from view/groupchat/group.ejs that any member types
+    var message=Mustache.render(template,{//the second parameter of render method is object that contains the data coming from socket/groupchat.js io.to
+        text: data.text, // the key text contains the message
+        sender:data.from//the key from contains sender
     });
+    $('#messages').append(message);//the message rendered from the view is appended to the element with messages id in view
+});
     
     $('#message-form').on('submit',function(e){//to add jQuery submit event to the form with id: message-form
         e.preventDefault();//we dont't want the form to reload once it is submitted
