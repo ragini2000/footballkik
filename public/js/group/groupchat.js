@@ -19,7 +19,7 @@ $(document).ready(function(){
         var ol = $('<ol></ol>');//creating ordered list
         
         for(var i = 0; i < users.length; i++){
-            ol.append('<p>'+users[i]+'</p>');//appending the users to the ol list tag
+            ol.append('<p><a id="val" data-toggle="modal" data-target="#myModal">'+users[i]+'</a></p>');//appending the users to the ol list tag
         }
         
         /*$(document).on('click', '#val', function(){

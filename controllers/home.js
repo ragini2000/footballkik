@@ -30,7 +30,7 @@ module.exports=function(async, Club, _){
                 }
                 //console.log(dataChunk);
                 const countrySort=_.sortBy(res2,"_id");//lodash sortby method to sort the countries i.e res2 under filter tag, since _id is string, res2 is sorted alphabetically
-                res.render('home',{title:'footballkik-home',data:dataChunk, country:countrySort});
+                res.render('home',{title:'footballkik-home',data:dataChunk, user:req.user, country:countrySort});
             })
         }
     }
