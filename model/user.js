@@ -8,7 +8,19 @@ const userSchema=mongoose.Schema({
     password:{type:String,unique:true,default:""},//we add default here since if user wants to login through fb or gmail, we dont need him to enter pasword
     UserImage:{type:String,default:"default.png"},//in database, we only store the name of the image and not the image itself, image is stored in AWS bucket
     facebook:{type:String,default:""},
-    fbToken:Array
+    fbToken:Array,
+    sentRequest: [{//array that contains the details to whom friend request is sent to
+        username: {type: String, default: ''}
+    }],
+    request: [{//contains the friend request sender's username and userID
+        userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        username: {type: String, default: ''}
+    }],
+    friendsList: [{//all friends' details
+        friendId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        friendName: {type: String, default: ''}
+    }],
+    totalRequest: {type: Number, default: 0}//pending friend requests
 
 });
 

@@ -21,12 +21,12 @@ $(document).ready(function(){
         for(var i = 0; i < users.length; i++){
             ol.append('<p><a id="val" data-toggle="modal" data-target="#myModal">'+users[i]+'</a></p>');//appending the users to the ol list tag
         }
-        
-        /*$(document).on('click', '#val', function(){
-            $('#name').text('@'+$(this).text());
-            $('#receiverName').val($(this).text());
-            $('#nameLink').attr("href", "/profile/"+$(this).text());
-        });*/
+        //in the online users section of group chat, 
+        $(document).on('click', '#val', function(){//when we click on the name. modal opens
+            $('#name').text('@'+$(this).text());//to show sender's name, gets the text from clicked element, no val since only display
+            $('#receiverName').val($(this).text());//to show receiver's name, it contains the above clicked name only, val to assign value
+            $('#nameLink').attr("href", "/profile/"+$(this).text());//name linked to profile using attr attribute
+        });
         
         $('#numValue').text('('+users.length+')');//in element with numValue i.e no. of users online display it as --> (users.length)
         $('#users').html(ol);//in the element with users as ID, add ol
