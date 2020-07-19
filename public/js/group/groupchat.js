@@ -6,7 +6,8 @@ $(document).ready(function(){
     socket.on("connect",function(){//to list to connection event
         console.log("Yeah! User connected");//this will be displayed in the browser
         var params={
-            room: room
+            room: room,
+            name:sender
         }
         socket.emit('join',params,function(){//emit the join event
             console.log("User has joined this channel");    

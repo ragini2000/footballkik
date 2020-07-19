@@ -12,6 +12,7 @@ const flash=require("connect-flash");//to display flash mesaages
 const passport=require("passport");//Passport stuff will help us authenticating with different method, it is an authentication middleware
 const socketIO=require("socket.io");
 const container=require("./container");
+const {Users}=require("./helpers/UsersClass");//getting the class {Users} exported from helpers/UsersClass file
 
 container.resolve(function(users, _, admin, home, group){//every route that we will use is passed as arguments in this function
     //configuration============================================================================================================
@@ -29,7 +30,7 @@ container.resolve(function(users, _, admin, home, group){//every route that we w
         });
         ConfigureExpress(app);
         //setup router
-        require("./socket/groupchat")(io);
+        require("./socket/groupchat")(io, Users);//adding {Users} here so tat it can be used inside the socket folder
         const router = require("express-promise-router")();//this allows middleware to return promises
         users.SetRouting(router);//users.js in controller folder, here we will set router.post, router.get, setRouting will be a function in users.js file that will hold all the routes
         admin.SetRouting(router);
