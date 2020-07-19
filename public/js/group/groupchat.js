@@ -13,8 +13,27 @@ $(document).ready(function(){
             console.log("User has joined this channel");    
         });
     });
+
+    socket.on('usersList', function(users){
+        //console.log(users);
+        var ol = $('<ol></ol>');//creating ordered list
+        
+        for(var i = 0; i < users.length; i++){
+            ol.append('<p>'+users[i]+'</p>');//appending the users to the ol list tag
+        }
+        
+        /*$(document).on('click', '#val', function(){
+            $('#name').text('@'+$(this).text());
+            $('#receiverName').val($(this).text());
+            $('#nameLink').attr("href", "/profile/"+$(this).text());
+        });
+        
+        $('#numValue').text('('+users.length+')');*/
+        $('#users').html(ol);
+    });
     
     socket.on('newMessage',function(data){//to listen to the event coming from server side, "data" stores the data that comes along with event 
+    //console.log(data);
     var template=$('#message-template').html();//we have the message template coming from view/groupchat/group.ejs that any member types
     var message=Mustache.render(template,{//the second parameter of render method is object that contains the data coming from socket/groupchat.js io.to
         text: data.text, // the key text contains the message

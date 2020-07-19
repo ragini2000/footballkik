@@ -11,6 +11,7 @@ module.exports=function(io,Users){//check server.js file line 33, using {Users} 
             //users.push(params.room);//to store the room of users connected to same room/channel {INSTEAD will be done using ES6 class}
             //users.push(socket.id);//to store he name of users connected to same room/channel {INSTEAD will be done using ES6 class}
             users.AddUserData(socket.id, params.name, params.room);//use the AddUserData method of Users class to add new users data
+            io.to(params.room).emit('usersList', users.GetUsersList(params.room));
             console.log(users);
             callback();
         });
@@ -24,6 +25,14 @@ module.exports=function(io,Users){//check server.js file line 33, using {Users} 
             });
             callback();
         });
+
+        socket.on('disconnect', () => {//socket.io disconnet event
+            var user = users.RemoveUser(socket.id);//remove/disconnect user
+            
+            if(user){//if user array exist
+                io.to(user.room).emit('usersList', users.GetUsersList(user.room));//updated list of connected user displayed
+            }
+        })
     });  
 
 }
