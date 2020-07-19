@@ -26,10 +26,10 @@ $(document).ready(function(){
             $('#name').text('@'+$(this).text());
             $('#receiverName').val($(this).text());
             $('#nameLink').attr("href", "/profile/"+$(this).text());
-        });
+        });*/
         
-        $('#numValue').text('('+users.length+')');*/
-        $('#users').html(ol);
+        $('#numValue').text('('+users.length+')');//in element with numValue i.e no. of users online display it as --> (users.length)
+        $('#users').html(ol);//in the element with users as ID, add ol
     });
     
     socket.on('newMessage',function(data){//to listen to the event coming from server side, "data" stores the data that comes along with event 
