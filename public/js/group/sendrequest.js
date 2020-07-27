@@ -16,10 +16,11 @@ $(document).ready(function(){
     });
 
     socket.on('newFriendRequest', function(friend){
-        console.log(friend);
-        /*$('#reload').load(location.href + ' #reload');
+        //console.log(friend);
+        //notification for the user to automatically know when a new friend request comes in
+        $('#reload').load(location.href + ' #reload');//load methods loads data from the server and returns the data to the element
         
-        $(document).on('click', '#accept_friend', function(){
+        /*$(document).on('click', '#accept_friend', function(){
             var senderId = $('#senderId').val();
             var senderName = $('#senderName').val();
 
