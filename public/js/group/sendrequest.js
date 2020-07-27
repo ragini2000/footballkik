@@ -41,15 +41,8 @@ $(document).ready(function(){
         e.preventDefault();//to prevent the page from reloading/refreshing
         
         var receiverName = $('#receiverName').val();//receiverName from value entered at this id in group.ejs file
-        
-        socket.emit('friendRequest', {//we need to emit new friendRequest event, it contains objects-sender name and receiver name
-            receiver: receiverName,// this event is to show real time notification as soon as the request is sent and details is added to the DB
-            sender: sender
-        }, function(){//acknowledgement added
-            console.log('Request Sent');//to displayed in browser console
-        })
 
-        /*$.ajax({//send the data using the AJAX method to the database and after sending we need to emit another new event, which after
+        $.ajax({//send the data using the AJAX method to the database and after sending we need to emit another new event, which after
             //we go to the friend.js file to listen for that event
             url: '/group/' + room,
             type: 'POST',//posting data to the database
@@ -64,6 +57,6 @@ $(document).ready(function(){
                     console.log('Request Sent');//to displayed in browser console
                 })
             }
-        })*/
+        })
     });
 });
