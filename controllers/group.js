@@ -1,3 +1,5 @@
+const { result } = require("lodash");
+
 module.exports=function(Users, async){
     return{
         SetRouting: function(router){
@@ -7,7 +9,22 @@ module.exports=function(Users, async){
 
         groupPage: function(req,res){
             const name=req.params.name;
-            res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name});
+
+            async.parallel([//to get the data of every logged in users
+                function(callback){
+                    Users.findOne({'username': req.user.username})//mongoose method to find data with same username
+                        .populate('request.userId')//populate method used as chaining to add the userId object into request object array
+                        
+                        .exec((err, result) => {
+                            callback(err, result);
+                        })
+                }
+            ],(err,results)=>{
+                const result1 = results[0];
+                //console.log(result1.request[0].userId);//prints all the details of the person who sent the request
+                res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name, data: result1});
+            });
+            
         },
 
         groupPostPage: function(req, res){
@@ -16,13 +33,13 @@ module.exports=function(Users, async){
                     if(req.body.receiverName){//if receiverName exists
                         Users.update({//Users collection for the receiver is updated
                            'username': req.body.receiverName,//get the sender's username
-                           'request.userID':{$ne: req.user._id}, //to check the user_id doesnt already exists, i.e sender is not already
+                           'request.userId':{$ne: req.user._id}, //to check the user_id doesnt already exists, i.e sender is not already
                             //present in friend's list using mongoDB not equal operator $ne
-                            'friendsList.friendID':{$ne: req.user._id}//to check sender is not already present in DB
+                            'friendsList.friendId':{$ne: req.user._id}//to check sender is not already present in DB
                         },//else
                         {
                             $push:{request:{//mongoDB push operator to store the detail of the sender in the request object, refer model/user
-                                userID:req.user._id,
+                                userId:req.user._id,
                                 username:req.user.username
                             }},
                             $inc: {totalRequest:1}// mongoDB inc operator to increment totalRequest field of receiver
@@ -37,7 +54,7 @@ module.exports=function(Users, async){
                         Users.update({//Users collection for the receiver is updated
                             'username': req.user.username,//get the receiver's username
                             'sentRequest.username':{$ne: req.body.receiverName}, //to check if friend request already sent earlier to this receiver
-                             'friendsList.friendID':{$ne: req.user._id}//to check sender is not already present in DB
+                             'friendsList.friendId':{$ne: req.user._id}//to check sender is not already present in DB
                          },
                          {
                             $push:{sentRequest:{//to push receivers data into sentRequest field of model/user
