@@ -20,11 +20,11 @@ $(document).ready(function(){
         //notification for the user to automatically know when a new friend request comes in
         $('#reload').load(location.href + ' #reload');//load methods loads data from the server and returns the data to the element
         
-        /*$(document).on('click', '#accept_friend', function(){
-            var senderId = $('#senderId').val();
+        $(document).on('click', '#accept_friend', function(){//to accept the friend request
+            var senderId = $('#senderId').val();//from navbar.ejs
             var senderName = $('#senderName').val();
 
-            $.ajax({
+            $.ajax({//to save in the database
                 url: '/group/'+room,
                 type: 'POST',
                 data: {
@@ -32,11 +32,12 @@ $(document).ready(function(){
                     senderName: senderName
                 },
                 success: function(){
-                    $(this).parent().eq(1).remove();
+                    $(this).parent().eq(1).remove();//to remove every element of that sender from the request dropdown
                 }
             });
-            $('#reload').load(location.href + ' #reload');*/
+            $('#reload').load(location.href + ' #reload');
         });
+    });
 
     $('#add_friend').on('submit', function(e){//on clicking submit button, i.e add_friend id form in group.ejs file
         e.preventDefault();//to prevent the page from reloading/refreshing
@@ -60,4 +61,23 @@ $(document).ready(function(){
             }
         })
     });
+
+    $('#accept_friend').on('click', function(){
+        var senderId = $('#senderId').val();
+        var senderName = $('#senderName').val();
+        
+        $.ajax({
+            url: '/group/'+room,
+            type: 'POST',
+            data: {
+                senderId: senderId,
+                senderName: senderName
+            },
+            success: function(){
+                $(this).parent().eq(1).remove();
+            }
+        });
+        $('#reload').load(location.href + ' #reload');
+    });
 });
+

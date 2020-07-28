@@ -14,7 +14,6 @@ module.exports=function(Users, async){
                 function(callback){
                     Users.findOne({'username': req.user.username})//mongoose method to find data with same username
                         .populate('request.userId')//populate method used as chaining to add the userId object into request object array
-                        
                         .exec((err, result) => {
                             callback(err, result);
                         })
@@ -68,7 +67,51 @@ module.exports=function(Users, async){
             ],(err,results)=>{//results stores the updated fields from the above function
                 res.redirect('/group/'+req.params.name);
             });
-        }
 
+            async.parallel([// to accept the friend request
+            //this function is to update the data of the receiver of the friend request when it is accepted
+                function(callback){//to update friendList object array for receiver in case request accepted
+                    if(req.body.senderId){//senderId present, refer navbar.ejs- request dropdown section
+                        Users.update({
+                            '_id':req.user._id,//to check if collection consists the _id of the logged in user
+                            'friendsList.friendId': {$ne: req.body.senderId}//to check if the sender's ID not already exists in the friendList
+                        },{
+                            $push: {friendsList: {
+                                friendId:req.body.senderId,//whatever is coming from the view inside the senderId element will be pushed 
+                                friendName:req.body.senderName//inside the friendId of friendList object array
+                            }},
+                            $pull: {request: {// to pull out/remove the data from the request object array
+                                userId:req.body.senderId,
+                                username:req.body.senderName
+                            }},
+                            $inc: {totalRequest: -1}//decreasing the totalRequest
+                        },(err,count)=>{
+                            callback(err,count);
+                        });
+                    }
+                },
+                //this function is to update the data of the sender of the friend request when it is accepted by the receiver
+                function(callback){
+                    if(req.body.senderId){//senderId present, refer navbar.ejs- request dropdown section
+                        Users.update({
+                            '_id':req.body.senderId,//to check if collection consists the senderId of the logged in user
+                            'friendsList.friendId': {$ne: req.user._id}//to check if the receiver's ID not already exists in the friendList
+                        },{
+                            $push: {friendsList: {
+                                friendId:req.user._id,//whatever is coming from the view inside the senderId element will be pushed 
+                                friendName:req.user.username//inside the friendId of friendList object array
+                            }},
+                            $pull: {sentRequest: {// to pull out/remove the data from the sentRequest object array
+                                username:req.user.username
+                            }},
+                        },(err,count)=>{
+                            callback(err,count);
+                        });
+                    }
+                }
+            ],(err,results)=>{
+                res.redirect('/group/'+req.params.name);   
+            });
+        }
     }
 }
