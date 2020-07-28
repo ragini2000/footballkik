@@ -1,4 +1,4 @@
-module.exports=function(async, Club, _){
+module.exports=function(async, Club, _, Users){
     return{
         SetRouting: function(router){
             router.get("/home",this.homePage);    
@@ -18,10 +18,19 @@ module.exports=function(async, Club, _){
                     }], (err, newResult) => {
                        callback(err, newResult) ;
                     });
+                },
+                function(callback){
+                    Users.findOne({'username': req.user.username})//mongoose method to find data with same username
+                        .populate('request.userId')//populate method used as chaining to add the userId object into request object array
+                        .exec((err, result) => {
+                            callback(err, result);
+                        })
                 }
+
             ],(err,results)=>{
                 const res1=results[0];//result of find method in function 1
                 const res2=results[1];//result of aggregate method in function 2
+                const res3=results[2];
                 //console.log(res2);//to check data
                 const dataChunk=[];//to have 3 boxes in a row
                 const chunkSize=3;
@@ -30,7 +39,7 @@ module.exports=function(async, Club, _){
                 }
                 //console.log(dataChunk);
                 const countrySort=_.sortBy(res2,"_id");//lodash sortby method to sort the countries i.e res2 under filter tag, since _id is string, res2 is sorted alphabetically
-                res.render('home',{title:'footballkik-home',data:dataChunk, user:req.user, country:countrySort});
+                res.render('home',{title:'footballkik-home',chunks:dataChunk, user:req.user, country:countrySort, data:res3});
             })
         }
     }
