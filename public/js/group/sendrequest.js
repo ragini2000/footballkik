@@ -37,6 +37,22 @@ $(document).ready(function(){
             });
             $('#reload').load(location.href + ' #reload');
         });
+
+        $(document).on('click', '#cancel_friend', function(){//to accept the friend request
+            var user_Id = $('#user_Id').val();//from partial/navbar.ejs
+
+            $.ajax({//to save in the database
+                url: '/group/'+room,
+                type: 'POST',
+                data: {
+                    user_Id: user_Id
+                },
+                success: function(){
+                    $(this).parent().eq(1).remove();//to remove every element of that sender from the request dropdown
+                }
+            });
+            $('#reload').load(location.href + ' #reload');
+        });
     });
 
     $('#add_friend').on('submit', function(e){//on clicking submit button, i.e add_friend id form in group.ejs file
@@ -72,6 +88,22 @@ $(document).ready(function(){
             data: {
                 senderId: senderId,
                 senderName: senderName
+            },
+            success: function(){
+                $(this).parent().eq(1).remove();
+            }
+        });
+        $('#reload').load(location.href + ' #reload');
+    });
+
+    $('#cancel_friend').on('click', function(){//to cancel friend request i.e not accept
+        var user_Id = $('#user_Id').val();//from partial/navbar.ejs
+
+        $.ajax({
+            url: '/group/'+room,
+            type: 'POST',
+            data: {
+                user_Id: user_Id
             },
             success: function(){
                 $(this).parent().eq(1).remove();

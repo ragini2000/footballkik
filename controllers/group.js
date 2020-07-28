@@ -90,6 +90,7 @@ module.exports=function(Users, async){
                         });
                     }
                 },
+
                 //this function is to update the data of the sender of the friend request when it is accepted by the receiver
                 function(callback){
                     if(req.body.senderId){//senderId present, refer navbar.ejs- request dropdown section
@@ -108,7 +109,41 @@ module.exports=function(Users, async){
                             callback(err,count);
                         });
                     }
+                },
+
+                //this function is to update the data of receiver on canceling friend request
+                function(callback){
+                    if(req.body.user_Id){//senderId present, refer navbar.ejs- request dropdown section
+                        Users.update({
+                            '_id':req.user._id,//to check if collection consists the senderId of the logged in user (receiver)
+                            'request.userId': {$eq: req.body.user_Id}//to check if the sender's ID already exists in the friendList
+                        },{
+                            $pull: {request: {// to pull out/remove the data from the request object array
+                                userId:req.body.user_Id//remove userId of sender
+                            }},
+                            $inc: {totalRequest: -1}//decrement totalRequest by 1
+                        },(err,count)=>{
+                            callback(err,count);
+                        });
+                    }
+                },
+
+                //this function is to update the data of the sender on cancelling of friend request by receiver
+                function(callback){
+                    if(req.body.user_Id){//senderId present, refer navbar.ejs- request dropdown section
+                        Users.update({
+                            '_id':req.body.user_Id,//to check if collection consists the senderId of the logged in user
+                            'sentRequest.username': {$eq: req.user.username}//to check if the sender's ID already exists in the friendList
+                        },{
+                            $pull: {sentRequest: {// to pull out/remove the data from the sentRequest object array
+                                username:req.user.username //remove username of receiver
+                            }}
+                        },(err,count)=>{
+                            callback(err,count);
+                        });
+                    }
                 }
+                
             ],(err,results)=>{
                 res.redirect('/group/'+req.params.name);   
             });
