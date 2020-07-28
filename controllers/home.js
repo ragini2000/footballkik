@@ -1,7 +1,8 @@
 module.exports=function(async, Club, _, Users){
     return{
         SetRouting: function(router){
-            router.get("/home",this.homePage);    
+            router.get("/home",this.homePage);  
+            router.post("/home",this.postHomePage);
         },
         homePage: function(req,res){
             async.parallel([//async.parallel method to run multiple asynchronous operations in parallel.
@@ -41,6 +42,26 @@ module.exports=function(async, Club, _, Users){
                 const countrySort=_.sortBy(res2,"_id");//lodash sortby method to sort the countries i.e res2 under filter tag, since _id is string, res2 is sorted alphabetically
                 res.render('home',{title:'footballkik-home',chunks:dataChunk, user:req.user, country:countrySort, data:res3});
             })
+        },
+        postHomePage: function(req,res){
+            async.parallel([
+                function(callback){//update the club document inside the club collection when a user adds any club as favourite
+                    Club.update({
+                        '_id':req.body.id,//we search in the club collection the _id 
+                        'fans.username':{$ne:req.user.username}//to check if the user diesnt already exists in the fans object array
+                    },{
+                        $push : {fans: {//to push the data inside the fans object array
+                            username:req.user.username,
+                            email:req.user.email
+                        }}
+                    },(err,count)=>{
+                        console.log(count);
+                        callback(err,count);
+                    });
+                }
+            ],(err,results)=>{
+                res.redirect('/home');
+            });
         }
     }
 }
