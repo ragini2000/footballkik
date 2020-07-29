@@ -16,15 +16,15 @@ module.exports = function(io, Global, _){
             //listen in the client side and then displayed in the browser who all are online
         });
         
-        /*socket.on('disconnect', () => {
-            const user = clients.RemoveUser(socket.id);
+        socket.on('disconnect', () => {//to remove user from the list of online friends when a user logs out/disconnect from globalroom
+            const user = clients.RemoveUser(socket.id);//socket.id of the user that disconnects
             
-            if(user){
-                var userData = clients.GetRoomList(user.room);
-                const arr = _.uniqBy(userData, 'name');
-                const removeData = _.remove(arr, {'name': user.name})
-                io.to(user.room).emit('loggedInUser', arr);
+            if(user){//if user exists
+                var userData = clients.GetRoomList(user.room);//retreive user data from user room
+                const arr = _.uniqBy(userData, 'name');//to remove duplicates
+                const removeData = _.remove(arr, {'name': user.name})//removes the user data (of logged out user) automatically from the arr
+                io.to(user.room).emit('loggedInUser', arr);//emit updated arr after deletion of logged out user data
             }
-        })*/
+        })
     });
 }
