@@ -5,6 +5,7 @@ module.exports=function(Users, async){
         SetRouting: function(router){
         router.get("/group/:name",this.groupPage);
         router.post('/group/:name', this.groupPostPage);
+        router.get("/logout",this.logout);
         },
 
         groupPage: function(req,res){
@@ -146,6 +147,13 @@ module.exports=function(Users, async){
                 
             ],(err,results)=>{
                 res.redirect('/group/'+req.params.name);   
+            });
+        },
+
+        logout: function(req,res){//destroy the user session when the user clicks the logout button and will be redirected to the index page
+            req.logout();//logout method
+            req.session.destroy((err)=>{//destroy the session
+                res.redirect('/');//redirect to index page
             });
         }
     }

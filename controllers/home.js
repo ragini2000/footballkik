@@ -3,6 +3,7 @@ module.exports=function(async, Club, _, Users){
         SetRouting: function(router){
             router.get("/home",this.homePage);  
             router.post("/home",this.postHomePage);
+            router.get("/logout",this.logout);
         },
         homePage: function(req,res){
             async.parallel([//async.parallel method to run multiple asynchronous operations in parallel.
@@ -62,6 +63,12 @@ module.exports=function(async, Club, _, Users){
             ],(err,results)=>{
                 res.redirect('/home');
             });
-        }
+        },
+    logout: function(req,res){//destroy the user session when the user clicks the logout button and will be redirected to the index page
+        req.logout();//logout method
+        req.session.destroy((err)=>{//destroy the session
+            res.redirect('/');//redirect to index page
+        });
+    }
     }
 }
