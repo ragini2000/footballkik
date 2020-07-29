@@ -16,7 +16,7 @@ const {Users}=require("./helpers/UsersClass");//getting the class {Users} export
 const {Global}=require("./helpers/Global");//getting the class {Users} exported from helpers/UsersClass file
 
 
-container.resolve(function(users, _, admin, home, group){//every route that we will use is passed as arguments in this function
+container.resolve(function(users, _, admin, home, group, results){//every route that we will use is passed as arguments in this function
     //configuration============================================================================================================
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/footballkik',{ useUnifiedTopology: true, useNewUrlParser: true}); //connect to our database  
@@ -41,6 +41,8 @@ container.resolve(function(users, _, admin, home, group){//every route that we w
         admin.SetRouting(router);
         home.SetRouting(router);
         group.SetRouting(router);
+        results.SetRouting(router);
+
         app.use(router);
         
     }
