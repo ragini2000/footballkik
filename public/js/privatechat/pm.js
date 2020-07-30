@@ -4,6 +4,8 @@ $(document).ready(function(){
     var paramOne= $.deparam(window.location.pathname);//value returned from deparam.js//paramOne acts as room 1
     //console.log(paramOne);
     var newParam= paramOne.split('.');//split at .
+    var username= newParam[0];
+    $('#receiver_name').text('@'+username);//refer privatechat.ejs line 103
     //console.log('1',newParam);
     swap(newParam,0,1);//swapping value at index1 with value at index2 in newParam array
     //console.log('2',newParam);
