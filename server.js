@@ -35,6 +35,7 @@ container.resolve(function(users, _, admin, home, group, results, privatechat){/
         require("./socket/groupchat")(io, Users);//adding {Users} here so that it can be used inside the socket folder
         require("./socket/friend")(io);//adding io here so that it can be used inside the socket folder
         require("./socket/globalroom")(io, Global, _);
+        require("./socket/privatemessage")(io);
 
         const router = require("express-promise-router")();//this allows middleware to return promises
         users.SetRouting(router);//users.js in controller folder, here we will set router.post, router.get, setRouting will be a function in users.js file that will hold all the routes
