@@ -7,8 +7,13 @@ module.exports= function(io){
 
         });
 
-        socket.on('private message',(message)=>{
-            console.log(message);
-        })
+        socket.on('private message',(message, callback)=>{
+            //console.log(message);
+            io.to(message.room).emit('new message',{//whoever is connected to this room channel will be able to listen 
+                text: message.text,                 //newMessage event
+                sender: message.sender
+            });
+            callback();
+        });
     });
 }

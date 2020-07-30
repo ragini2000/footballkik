@@ -17,6 +17,15 @@ $(document).ready(function(){
         socket.emit('join PM', params);//emitting the params object
     });
 
+    socket.on('new message', function(data){// to listen to the new message event emitted from server side
+        var template=$('#message-template').html();//we have the message template coming from views/private/privatechat.ejs that any member types
+        var message=Mustache.render(template,{//the second parameter of render method is object that contains the data coming from socket/privatechat.js io.to
+            text: data.text, // the key text contains the message
+            sender:data.sender//the key from contains sender
+        });
+        $('#messages').append(message);//the message rendered from the view is appended to the element with messages id in view
+    });
+
     $('#message_form').on('submit',function(e){//to add jQuery submit event to the form with id: message_form
         e.preventDefault();//we dont't want the form to reload once it is submitted
 
@@ -26,7 +35,10 @@ $(document).ready(function(){
         if(msg.trim().length > 0){//trim method to remove white spaces if this is true then we will emit the object
             socket.emit('private message',{//to emit "private message" event on the server side
             text: msg, // text is the object that will contain the data
-            sender: sender
+            sender: sender,
+            room: paramOne
+        },function(){
+            $('#msg').val('');//to clear the message box after clicking send button  
         })
     }    
     });
