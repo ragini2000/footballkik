@@ -12,9 +12,10 @@ module.exports=function(async, Club){
         postResults: function(req, res){
             async.parallel([
                 function(callback){
-                    const regex = new RegExp((req.body.country), 'gi');
-                    
-                    Club.find({'country':regex}, (err, result) => {
+                    const regex = new RegExp((req.body.country), 'gi');//RegExp for matching text with the pattern, g flag for global search
+                                                                    //i flag for ignore case 
+                            //mongoDb or operator to seach for any of the value specified in the object
+                    Club.find({'$or': [{'country':regex}, {'name': regex}]}, (err, result) => {//searching either by name or country
                        callback(err, result); 
                     });
                 }
@@ -26,7 +27,7 @@ module.exports=function(async, Club){
                 for (let i = 0; i < res1.length; i += chunkSize){
                     dataChunk.push(res1.slice(i, i+chunkSize));
                 }
-                console.log(dataChunk);
+                //console.log(dataChunk);
                 res.render('results', {title: 'Footballkik - Results', user: req.user, chunks: dataChunk});
             })
         }
