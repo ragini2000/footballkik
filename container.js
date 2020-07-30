@@ -9,6 +9,7 @@ const simpleDependencies=[
     ['formidable','formidable'],
     ['async', 'async'], 
     ['Users','./model/user'],
+    ['Message','./model/message'],
     ['Club', './model/clubs']//boday-parser doesnt allow us to pass data like images and files hence a third party module like formidable is used
 
 ]

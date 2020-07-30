@@ -41,8 +41,24 @@ $(document).ready(function(){
             room: paramOne
         },function(){
             $('#msg').val('');//to clear the message box after clicking send button  
-        })
+        });
     }    
+    });
+
+    //when the send button is clicked save the message to the DB
+    $('#send-message').on('click',function(){
+        var message=$('#msg').val();//extract message from the message box
+
+        $.ajax({//to save message in the DB
+            url:'/chat/'+paramOne,
+            type: 'POST',
+            data: {//post message to the database
+                message: message
+            },
+            success: function(){
+                $('#msg').val('');    
+            }
+        })
     });
 });
 function swap(input, value_1, value_2){//for swapping the values stored in newParam
