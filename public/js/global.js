@@ -29,8 +29,9 @@ $(document).ready(function(){
         //indexof javascript method checks if the value exists inside an index and return the position of that value else returns -1
             if(friend.indexOf(users[i].name) > -1){//we are searching for the above name (at line 21) inside the friend array
                 arr.push(users[i]);
+                var userName= users[i].name.toLowerCase();
                 var list = '<img src="https://placehold.it/300x300" class="pull-left img-circle" style="width:50px; height:50px; margin-right:10px;" /><p>' +
-                '<a id="val" href="/chat"><h3 style="padding-top:15px; color:gray; font-size:14px;">'+'@'+users[i].name+'<span class="fa fa-circle online_friend"></span></h3></a></p>' 
+                '<a id="val" href="/chat/'+userName.replace(/ /g,"-")+'.'+name.replace(/ /g, "-")+'"><h3 style="padding-top:15px; color:gray; font-size:14px;">'+'@'+users[i].name+'<span class="fa fa-circle online_friend"></span></h3></a></p>' 
                 ol.append(list);
             }
         }
