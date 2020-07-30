@@ -56,7 +56,7 @@ module.exports=function(async, Club, _, Users){
                             email:req.user.email
                         }}
                     },(err,count)=>{
-                        console.log(count);
+                        //console.log(count);
                         callback(err,count);
                     });
                 }
