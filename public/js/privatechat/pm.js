@@ -46,17 +46,17 @@ $(document).ready(function(){
     });
 
     //when the send button is clicked save the message to the DB
-    $('#send-message').on('click',function(){
-        var message=$('#msg').val();//extract message from the message box
-
-        $.ajax({//to save message in the DB
+    $('#send-message').on('click', function(){
+        var message = $('#msg').val();
+        
+        $.ajax({
             url:'/chat/'+paramOne,
             type: 'POST',
-            data: {//post message to the database
+            data: {
                 message: message
             },
             success: function(){
-                $('#msg').val('');    
+                $('#msg').val('');
             }
         })
     });

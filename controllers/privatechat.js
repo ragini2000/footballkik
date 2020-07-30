@@ -12,6 +12,32 @@ module.exports= function(async, Users, Message){
                         .exec((err, result) => {
                             callback(err, result);
                         })
+                },
+                function(callback){
+                    const nameRegex = new RegExp("^" + req.user.username.toLowerCase(), "i")
+                    Message.aggregate([
+                        {$match:{$or:[{"senderName":nameRegex}, {"receiverName":nameRegex}]}},
+                        {$sort:{"createdAt":-1}},
+                        {
+                            $group:{"_id":{
+                            "last_message_between":{
+                                $cond:[
+                                    {
+                                        $gt:[
+                                        {$substr:["$senderName",0,1]},
+                                        {$substr:["$receiverName",0,1]}]
+                                    },
+                                    {$concat:["$senderName"," and ","$receiverName"]},
+                                    {$concat:["$receiverName"," and ","$senderName"]}
+                                ]
+                            }
+                            }, "body": {$first:"$$ROOT"}
+                            }
+                        }], function(err, newResult){
+                            console.log(newResult);
+                            callback(err,newResult);
+                        }
+                    )
                 }
             ],(err,results)=>{
                 const result1 = results[0];
@@ -20,45 +46,42 @@ module.exports= function(async, Users, Message){
             });    
         },
 
-        chatPostPage: function(req,res,next){
-            const params=req.params.name.split('.');//returns an array
-            const nameParams=params[0];//receiver's name at index 0
-
-            //to search through the database for nameParams by ignoring case
-            const nameRegex=new RegExp("^"+nameParams.toLowerCase(),"i");//to ignore case i flag- to convert everything in nameParams to lowercase
-        
-            async.waterfall([//waterfall is used to use result of one function in next function
-                function(callback){//function 1: fetches data of receiver
-                    if(req.body.message){//if we have message in the input field
-                        Users.findOne({'username':{$regex: nameRegex}},(err,data)=>{//findOne returns data of the receiver from DB
-                            callback(err,data);
+        chatPostPage: function(req, res, next){
+            const params = req.params.name.split('.');
+            const nameParams = params[0];
+            const nameRegex = new RegExp("^"+nameParams.toLowerCase(), "i");
+            
+            async.waterfall([
+                function(callback){
+                    if(req.body.message){
+                        Users.findOne({'username':{$regex: nameRegex}}, (err, data) => {
+                           callback(err, data);
                         });
                     }
                 },
-                //function 2: to push the message info into database
-                function(data,callback){//result of previous function used in this function
+                
+                function(data, callback){
                     if(req.body.message){
-                        const newMessage=new Message();
-                        newMessage.sender=req.user._id;//user is sending the message
-                        newMessage.receiver=data._id;//receiver's data
-                        newMessage.senderName=req.user.username;//user sending the message is logged in
-                        newMessage.receiverName=data.username;
-                        newMessage.message=req.body.message;
-                        newMessage.userImage=req.user.UserImage;
-                        newMessage.createAt=new Date();
-
-                        newMessage.save((err,result)=>{
+                        const newMessage = new Message();
+                        newMessage.sender = req.user._id;
+                        newMessage.receiver = data._id;
+                        newMessage.senderName = req.user.username;
+                        newMessage.receiverName = data.username;
+                        newMessage.message = req.body.message;
+                        newMessage.userImage = req.user.UserImage;
+                        newMessage.createdAt = new Date();
+                        
+                        newMessage.save((err, result) => {
                             if(err){
                                 return next(err);
                             }
-                            //console.log(result);
-                            callback(err,result);
+                            callback(err, result);
                         })
                     }
                 }
-            ],(err,results)=>{
+            ], (err, results) => {
                 res.redirect('/chat/'+req.params.name);
-            })
+            });
         }
     }
 }
