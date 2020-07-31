@@ -13,6 +13,10 @@ $(document).ready(function(){
             name: name,
             img: img
         });
+
+        socket.on('message display',function(){
+            $('#reload').load(location.href + ' #reload');
+        });
     });
 
     socket.on('loggedInUser', function(users){//to listen loggedInUser event emitted from socket/globalroom.js

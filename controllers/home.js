@@ -1,4 +1,4 @@
-module.exports=function(async, Club, _, Users){
+module.exports=function(async, Club, _, Users, Message){
     return{
         SetRouting: function(router){
             router.get("/home",this.homePage);  
@@ -27,12 +27,41 @@ module.exports=function(async, Club, _, Users){
                         .exec((err, result) => {
                             callback(err, result);
                         })
+                },
+
+                function(callback){
+                    const nameRegex = new RegExp("^" + req.user.username.toLowerCase(), "i")
+                    Message.aggregate([
+                        {$match:{$or:[{"senderName":nameRegex}, {"receiverName":nameRegex}]}},
+                        {$sort:{"createdAt":-1}},
+                        {
+                            $group:{"_id":{
+                            "last_message_between":{
+                                $cond:[
+                                    {
+                                        $gt:[
+                                        {$substr:["$senderName",0,1]},
+                                        {$substr:["$receiverName",0,1]}]
+                                    },
+                                    {$concat:["$senderName"," and ","$receiverName"]},
+                                    {$concat:["$receiverName"," and ","$senderName"]}
+                                ]
+                            }
+                            }, "body": {$first:"$$ROOT"}
+                            }
+                        }], function(err, newResult){
+                            //console.log(newResult);
+                            callback(err,newResult);
+                        }
+                    )
                 }
 
             ],(err,results)=>{
                 const res1=results[0];//result of find method in function 1
                 const res2=results[1];//result of aggregate method in function 2
                 const res3=results[2];
+                const res4=results[3];
+
                 //console.log(res2);//to check data
                 const dataChunk=[];//to have 3 boxes in a row
                 const chunkSize=3;
@@ -41,7 +70,7 @@ module.exports=function(async, Club, _, Users){
                 }
                 //console.log(dataChunk);
                 const countrySort=_.sortBy(res2,"_id");//lodash sortby method to sort the countries i.e res2 under filter tag, since _id is string, res2 is sorted alphabetically
-                res.render('home',{title:'footballkik-home',chunks:dataChunk, user:req.user, country:countrySort, data:res3});
+                res.render('home',{title:'footballkik-home',chunks:dataChunk, user:req.user, country:countrySort, data:res3, chat:res4});
             })
         },
         postHomePage: function(req,res){
@@ -59,6 +88,20 @@ module.exports=function(async, Club, _, Users){
                         //console.log(count);
                         callback(err,count);
                     });
+                },
+
+                function(callback){
+                    if(req.body.chatId){
+                        Message.update({
+                            '_id': req.body.chatId
+                        },
+                        {
+                            "isRead": true//to mark the msg read in DB
+                        },(err,done)=>{
+                            console.log(done)
+                            callback(err,done);
+                        })
+                    }
                 }
             ],(err,results)=>{
                 res.redirect('/home');
