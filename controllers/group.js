@@ -1,6 +1,6 @@
 const { result } = require("lodash");
 
-module.exports=function(Users, async){
+module.exports=function(Users, async, Message, FriendResult){
     return{
         SetRouting: function(router){
         router.get("/group/:name",this.groupPage);
@@ -18,136 +18,45 @@ module.exports=function(Users, async){
                         .exec((err, result) => {
                             callback(err, result);
                         })
+                },
+                function(callback){
+                    const nameRegex = new RegExp("^" + req.user.username.toLowerCase(), "i")
+                    Message.aggregate([
+                        {$match:{$or:[{"senderName":nameRegex}, {"receiverName":nameRegex}]}},
+                        {$sort:{"createdAt":-1}},
+                        {
+                            $group:{"_id":{
+                            "last_message_between":{
+                                $cond:[
+                                    {
+                                        $gt:[
+                                        {$substr:["$senderName",0,1]},
+                                        {$substr:["$receiverName",0,1]}]
+                                    },
+                                    {$concat:["$senderName"," and ","$receiverName"]},
+                                    {$concat:["$receiverName"," and ","$senderName"]}
+                                ]
+                            }
+                            }, "body": {$first:"$$ROOT"}
+                            }
+                        }], function(err, newResult){
+                            //console.log(newResult);
+                            callback(err,newResult);
+                        }
+                    )
                 }
             ],(err,results)=>{
                 const result1 = results[0];
+                const result2 = results[1];
+
                 //console.log(result1.request[0].userId);//prints all the details of the person who sent the request
-                res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name, data: result1});
+                res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name, data: result1, chat:result2});
             });
             
         },
 
         groupPostPage: function(req, res){
-            async.parallel([//we want to perform function 1 and function 2 parallely
-                function(callback){//function 1: to update receivers document
-                    if(req.body.receiverName){//if receiverName exists
-                        Users.update({//Users collection for the receiver is updated
-                           'username': req.body.receiverName,//get the sender's username
-                           'request.userId':{$ne: req.user._id}, //to check the user_id doesnt already exists, i.e sender is not already
-                            //present in friend's list using mongoDB not equal operator $ne
-                            'friendsList.friendId':{$ne: req.user._id}//to check sender is not already present in DB
-                        },//else
-                        {
-                            $push:{request:{//mongoDB push operator to store the detail of the sender in the request object, refer model/user
-                                userId:req.user._id,
-                                username:req.user.username
-                            }},
-                            $inc: {totalRequest:1}// mongoDB inc operator to increment totalRequest field of receiver
-                        },(err,count)=>{
-                            callback(err,count);
-                        })                                     
-                    }
-                },
-
-                function(callback){//function 2: to update senders document
-                    if(req.body.receiverName){
-                        Users.update({//Users collection for the receiver is updated
-                            'username': req.user.username,//get the receiver's username
-                            'sentRequest.username':{$ne: req.body.receiverName}, //to check if friend request already sent earlier to this receiver
-                             'friendsList.friendId':{$ne: req.user._id}//to check sender is not already present in DB
-                         },
-                         {
-                            $push:{sentRequest:{//to push receivers data into sentRequest field of model/user
-                                username: req.body.receiverName    
-                            }}
-                         },(err,count)=>{
-                             callback(err,count);
-                         })
-                    }
-                }
-            ],(err,results)=>{//results stores the updated fields from the above function
-                res.redirect('/group/'+req.params.name);
-            });
-
-            async.parallel([// to accept the friend request
-            //this function is to update the data of the receiver of the friend request when it is accepted
-                function(callback){//to update friendList object array for receiver in case request accepted
-                    if(req.body.senderId){//senderId present, refer navbar.ejs- request dropdown section
-                        Users.update({
-                            '_id':req.user._id,//to check if collection consists the _id of the logged in user
-                            'friendsList.friendId': {$ne: req.body.senderId}//to check if the sender's ID not already exists in the friendList
-                        },{
-                            $push: {friendsList: {
-                                friendId:req.body.senderId,//whatever is coming from the view inside the senderId element will be pushed 
-                                friendName:req.body.senderName//inside the friendId of friendList object array
-                            }},
-                            $pull: {request: {// to pull out/remove the data from the request object array
-                                userId:req.body.senderId,
-                                username:req.body.senderName
-                            }},
-                            $inc: {totalRequest: -1}//decreasing the totalRequest
-                        },(err,count)=>{
-                            callback(err,count);
-                        });
-                    }
-                },
-
-                //this function is to update the data of the sender of the friend request when it is accepted by the receiver
-                function(callback){
-                    if(req.body.senderId){//senderId present, refer navbar.ejs- request dropdown section
-                        Users.update({
-                            '_id':req.body.senderId,//to check if collection consists the senderId of the logged in user
-                            'friendsList.friendId': {$ne: req.user._id}//to check if the receiver's ID not already exists in the friendList
-                        },{
-                            $push: {friendsList: {
-                                friendId:req.user._id,//whatever is coming from the view inside the senderId element will be pushed 
-                                friendName:req.user.username//inside the friendId of friendList object array
-                            }},
-                            $pull: {sentRequest: {// to pull out/remove the data from the sentRequest object array
-                                username:req.user.username
-                            }},
-                        },(err,count)=>{
-                            callback(err,count);
-                        });
-                    }
-                },
-
-                //this function is to update the data of receiver on canceling friend request
-                function(callback){
-                    if(req.body.user_Id){//senderId present, refer navbar.ejs- request dropdown section
-                        Users.update({
-                            '_id':req.user._id,//to check if collection consists the senderId of the logged in user (receiver)
-                            'request.userId': {$eq: req.body.user_Id}//to check if the sender's ID already exists in the friendList
-                        },{
-                            $pull: {request: {// to pull out/remove the data from the request object array
-                                userId:req.body.user_Id//remove userId of sender
-                            }},
-                            $inc: {totalRequest: -1}//decrement totalRequest by 1
-                        },(err,count)=>{
-                            callback(err,count);
-                        });
-                    }
-                },
-
-                //this function is to update the data of the sender on cancelling of friend request by receiver
-                function(callback){
-                    if(req.body.user_Id){//senderId present, refer navbar.ejs- request dropdown section
-                        Users.update({
-                            '_id':req.body.user_Id,//to check if collection consists the senderId of the logged in user
-                            'sentRequest.username': {$eq: req.user.username}//to check if the sender's ID already exists in the friendList
-                        },{
-                            $pull: {sentRequest: {// to pull out/remove the data from the sentRequest object array
-                                username:req.user.username //remove username of receiver
-                            }}
-                        },(err,count)=>{
-                            callback(err,count);
-                        });
-                    }
-                }
-                
-            ],(err,results)=>{
-                res.redirect('/group/'+req.params.name);   
-            });
+            FriendResult.PostRequest(req, res,'/group/'+req.params.name);    
         },
 
         logout: function(req,res){//destroy the user session when the user clicks the logout button and will be redirected to the index page
