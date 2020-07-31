@@ -34,15 +34,16 @@ module.exports= function(async, Users, Message){
                             }, "body": {$first:"$$ROOT"}
                             }
                         }], function(err, newResult){
-                            console.log(newResult);
+                            //console.log(newResult);
                             callback(err,newResult);
                         }
                     )
                 }
             ],(err,results)=>{
                 const result1 = results[0];
+                const result2 = results[1];
                 //console.log(result1.request[0].userId);//prints all the details of the person who sent the request
-                res.render('private/privatechat',{title:'Footballkik- Private Chat', user:req.user, data: result1});
+                res.render('private/privatechat',{title:'Footballkik- Private Chat', user:req.user, data: result1, chat: result2});
             });    
         },
 
