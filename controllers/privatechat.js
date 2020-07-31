@@ -38,6 +38,15 @@ module.exports= function(async, Users, Message){
                             callback(err,newResult);
                         }
                     )
+                },
+                function(callback){//get the last messages from DB
+                    Message.find({'$or':[{'senderName':req.user.username}, {'receiverName':req.user.username}]})//returns all doc with given senderName or receiverName
+                        .populate('sender')//populate with data of sender
+                        .populate('receiver')//populate with data of receiver
+                        .exec((err, result3) => {
+                            //console.log(result3);
+                            callback(err, result3)
+                        })
                 }
             ],(err,results)=>{
                 const result1 = results[0];
