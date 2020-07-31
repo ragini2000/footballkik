@@ -44,13 +44,22 @@ module.exports=function(Users, async, Message, FriendResult, Group){
                             callback(err,newResult);
                         }
                     )
+                },
+                function(callback){
+                    Group.find({})
+                         .populate('sender')//to fetch the data of the sender in the grp chat in order to display their data
+                         .exec((err, result) => {
+                            callback(err, result)
+                         });
                 }
             ],(err,results)=>{
                 const result1 = results[0];
                 const result2 = results[1];
+                const result3 = results[2];
 
                 //console.log(result1.request[0].userId);//prints all the details of the person who sent the request
-                res.render("groupchat/group",{title:"Footballkik-group", user:req.user, groupName:name, data: result1, chat:result2});
+                res.render("groupchat/group",{title:"Footballkik-group", user:req.user, 
+                groupName:name, data: result1, chat:result2, groupMsg: result3});
             });
             
         },
