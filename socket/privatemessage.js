@@ -13,6 +13,8 @@ module.exports= function(io){
                 text: message.text,                 //newMessage event
                 sender: message.sender
             });
+            io.emit('message display',{});
+
             callback();
         });
     });
