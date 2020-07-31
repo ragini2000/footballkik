@@ -1,8 +1,9 @@
-module.exports=function(async, Club){
+module.exports=function(async, Club, Users){
     return {
         SetRouting: function(router){
             router.get('/results',this.getResults);
             router.post('/results',this.postResults);
+            router.get('/members', this.viewMembers);
         },
 
         getResults: function(req,res){//on going directly to result page you'll again land up on same homepage
@@ -29,6 +30,26 @@ module.exports=function(async, Club){
                 }
                 //console.log(dataChunk);
                 res.render('results', {title: 'Footballkik - Results', user: req.user, chunks: dataChunk});
+            })
+        },
+
+        viewMembers: function(req, res){
+            async.parallel([
+                function(callback){
+                    Users.find({}, (err, result) => {
+                       callback(err, result); 
+                    });
+                }
+            ], (err, results) => {
+                const res1 = results[0];
+                
+                const dataChunk  = [];
+                const chunkSize = 4;
+                for (let i = 0; i < res1.length; i += chunkSize){
+                    dataChunk.push(res1.slice(i, i+chunkSize));
+                }
+                //console.log(dataChunk);
+                res.render('members', {title: 'Footballkik - Members', user: req.user, chunks: dataChunk});
             })
         }
     }
