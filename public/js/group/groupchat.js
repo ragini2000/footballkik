@@ -52,6 +52,18 @@ $(document).ready(function(){
         },function(){
             $('#msg').val('');//once the user clicks send, the input field is cleared
         });
+
+        $.ajax({//to save group chat msgs in DB
+            url: '/group/'+room,
+            type: 'POST',
+            data: {
+                message: msg,
+                groupName: room
+            },
+            success: function(){
+                $('#msg').val('');
+            }
+        })
     });
 
 });
