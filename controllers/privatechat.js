@@ -51,8 +51,13 @@ module.exports= function(async, Users, Message){
             ],(err,results)=>{
                 const result1 = results[0];
                 const result2 = results[1];
+                const result3 = results[2];
+
+                const params = req.params.name.split('.');
+                const nameParams = params[0];
                 //console.log(result1.request[0].userId);//prints all the details of the person who sent the request
-                res.render('private/privatechat',{title:'Footballkik- Private Chat', user:req.user, data: result1, chat: result2});
+                res.render('private/privatechat',{title:'Footballkik- Private Chat', user:req.user, 
+                data: result1, chat: result2, chats: result3, name:nameParams});
             });    
         },
 
