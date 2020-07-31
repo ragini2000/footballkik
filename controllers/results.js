@@ -4,6 +4,7 @@ module.exports=function(async, Club, Users){
             router.get('/results',this.getResults);
             router.post('/results',this.postResults);
             router.get('/members', this.viewMembers);
+            router.post('/members', this.searchMembers);
         },
 
         getResults: function(req,res){//on going directly to result page you'll again land up on same homepage
@@ -49,6 +50,28 @@ module.exports=function(async, Club, Users){
                     dataChunk.push(res1.slice(i, i+chunkSize));
                 }
                 //console.log(dataChunk);
+                res.render('members', {title: 'Footballkik - Members', user: req.user, chunks: dataChunk});
+            })
+        },
+
+        searchMembers: function(req, res){//for member page
+            async.parallel([
+                function(callback){
+                    const regex = new RegExp((req.body.username), 'gi');//search for username globally ignoring cases
+                    
+                    Users.find({'username': regex}, (err, result) => {
+                       callback(err, result); 
+                    });
+                }
+            ], (err, results) => {
+                const res1 = results[0];
+                
+                const dataChunk  = [];
+                const chunkSize = 4;
+                for (let i = 0; i < res1.length; i += chunkSize){
+                    dataChunk.push(res1.slice(i, i+chunkSize));
+                }
+                
                 res.render('members', {title: 'Footballkik - Members', user: req.user, chunks: dataChunk});
             })
         }
