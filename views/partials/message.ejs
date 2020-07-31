@@ -1,6 +1,18 @@
+<% var numberOfTrue = 0 %>
+ 
+<% _.forEach(chat, function(value) { %>
+    <%  if(value.body.isRead === false){ %>
+        <%  numberOfTrue = numberOfTrue + 1 %>
+    <%  }  %>
+<% }) %>
+
 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
     <span class="fa fa-globe "></span> <b class="caret"></b> 
-    <span class="label label-primary nav-label-icon" id=""></span>
+    <% if(numberOfTrue !== 0) {%>
+        <span class="label label-primary nav-label-icon" id=""><%= numberOfTrue %></span>
+    <% } else { %>
+        <span class="label label-primary nav-label-icon" id=""></span>
+    <% } %>
 </a>
 <ul class="dropdown-menu dmenu">
     <li>
